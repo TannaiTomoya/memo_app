@@ -1,12 +1,18 @@
 <?php
 
-use function Livewire\Volt\{state};
+use function Livewire\Volt\{state, rules};
 use App\Models\Memo;
 
-state(['title','body']);
-
+//バリデーションルールを定義
+state(['title', 'body']);
+rules([
+    'title' => 'required|string|max:50',
+    'body' => 'required|string|max:2000',
+]);
 //メモ
 $store = function () {
+    $this->validate(); //バリデーションチェック
+
     //フォームからの入力値をデータベースに保存
     Memo::create($this->all());
     //一覧ページにリダイレクト
@@ -21,12 +27,20 @@ $store = function () {
     <form wire:submit="store">
 
         <p>
-            <label for="title">タイトル<label></br>
-                    <input type="text" wire:model="title" id="title">
+            <label for="title">タイトル</label>
+            @error('title')
+                <span class="error">({{ $message }})</span>
+            @enderror
+            <br>
+            <input type="text" wire:model="title" id="title">
         </p>
         <p>
-            <label for="body">本文<label></br>
-                    <textarea wire:model="body" id="body"></textarea>
+            <label for="body">本文</label>
+            @error('body')
+                <span class="error">({{ $message }})</span>
+            @enderror
+            <br>
+            <textarea wire:model="body" id="body"></textarea>
         </p>
         <button type="submit">登録</button>
     </form>
